@@ -56,8 +56,8 @@ object example {
       val et: EitherT[Future, Errs, Unit] = for {
         admin <- EitherT(adminAuthorizer.authorize(token))
         user <- EitherT(userRepository.findBy(userId))
-        _ <- EitherT(hogeMoneyService.enable(admin, user))
-      } yield ()
+        enabled <- EitherT(hogeMoneyService.enable(admin, user))
+      } yield enabled
 
       val result: Future[String] = et.value.map {
         case Left(AdminAuthorizerErr.TokenInvalid) => "401 Unauthorized"
