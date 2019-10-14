@@ -7,6 +7,7 @@ import eitherT.{Either, Right, Left, EitherT, Monad}
 import eitherT.Monad.MonadSyntax
 import eitherT.example._
 import scala.concurrent.{Future, ExecutionContext}
+import scala.util.{Success, Failure}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 import AdminAuthorizer.AdminAuthorizerErr
@@ -57,6 +58,18 @@ class ExampleTest {
 
     controller.enable("faketoken1", 42).foreach { result =>
       assertEquals(result, "500 Internal Server Error: HogeMoneyServiceErr.UnknownErr")
+    }
+  }
+
+  @Test def t4(): Unit = {
+    val controller = Controller(adminAuthorizer, userRepository, new HogeMoneyService {
+      override def enable(admin: Admin, user: User): Future[Either[HogeMoneyServiceErr, Unit]] = Future {
+        throw new Exception("err")
+      }
+    })
+
+    controller.enable("faketoken1", 42).foreach { result =>
+      assertEquals(result, "500 Internal Server Error: Unknown")
     }
   }
 

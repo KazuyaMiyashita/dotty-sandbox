@@ -70,7 +70,10 @@ object example {
         case Right(_) => "200 OK"
       }
 
-      result
+      result.recover { case e: Throwable =>
+        e.printStackTrace()
+        "500 Internal Server Error: Unknown"
+      }
 
     }
 
